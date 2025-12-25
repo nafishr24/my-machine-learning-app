@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediksi Obesitas - Aplikasi MLOps</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1><i class="fas fa-weight"></i> Prediksi Tingkat Obesitas</h1>
+        <p class="subtitle">
+          Aplikasi berbasis Machine Learning untuk memprediksi kategori berat
+          badan berdasarkan parameter kesehatan
+        </p>
+      </header>
+
+      <main>
+        <div class="app-container">
+          <div class="form-section">
+            <h2><i class="fas fa-edit"></i> Masukkan Data Kesehatan</h2>
+
+            <form id="prediction-form">
+              <div class="form-grid">
+                <!-- Gender (Radio) -->
+                <div class="form-group">
+                  <label for="gender">Jenis Kelamin *</label>
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="gender" value="Male" checked />
+                      <span class="radio-custom"></span>
+                      Laki-laki
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="gender" value="Female" />
+                      <span class="radio-custom"></span>
+                      Perempuan
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Age (Input) -->
+                <div class="form-group">
+                  <label for="age">Usia (tahun) *</label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="1"
+                    max="120"
+                    value="30"
+                    required
+                  />
+                  <div class="input-hint">Rentang: 1 - 120 tahun</div>
+                </div>
+
+                <!-- Height (Input) -->
+                <div class="form-group">
+                  <label for="height">Tinggi Badan (meter) *</label>
+                  <input
+                    type="number"
+                    id="height"
+                    name="height"
+                    min="0.5"
+                    max="2.5"
+                    step="0.01"
+                    value="1.70"
+                    required
+                  />
+                  <div class="input-hint">Contoh: 1.70 untuk 170 cm</div>
+                </div>
+
+                <!-- Weight (Input) -->
+                <div class="form-group">
+                  <label for="weight">Berat Badan (kg) *</label>
+                  <input
+                    type="number"
+                    id="weight"
+                    name="weight"
+                    min="10"
+                    max="300"
+                    step="0.1"
+                    value="70"
+                    required
+                  />
+                  <div class="input-hint">Dalam kilogram</div>
+                </div>
+
+                <!-- Family History (Radio) -->
+                <div class="form-group">
+                  <label for="family_history"
+                    >Riwayat Keluarga dengan Kelebihan Berat Badan *</label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="family_history" value="yes" />
+                      <span class="radio-custom"></span>
+                      Ya
+                    </label>
+                    <label class="radio-label">
+                      <input
+                        type="radio"
+                        name="family_history"
+                        value="no"
+                        checked
+                      />
+                      <span class="radio-custom"></span>
+                      Tidak
+                    </label>
+                  </div>
+                </div>
+
+                <!-- FAVC (Radio) -->
+                <div class="form-group">
+                  <label for="favc"
+                    >Sering Mengonsumsi Makanan Tinggi Kalori? *</label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="favc" value="yes" />
+                      <span class="radio-custom"></span>
+                      Ya
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="favc" value="no" checked />
+                      <span class="radio-custom"></span>
+                      Tidak
+                    </label>
+                  </div>
+                </div>
+
+                <!-- FCVC (Slider) -->
+                <div class="form-group">
+                  <label for="fcvc">Frekuensi Konsumsi Sayuran *</label>
+                  <div class="slider-container">
+                    <input
+                      type="range"
+                      id="fcvc"
+                      name="fcvc"
+                      min="1"
+                      max="3"
+                      step="1"
+                      value="2"
+                    />
+                    <div class="slider-labels">
+                      <span>1 (Jarang)</span>
+                      <span>2 (Sedang)</span>
+                      <span>3 (Sering)</span>
+                    </div>
+                    <div class="slider-value">
+                      Nilai: <span id="fcvc-value">2</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- NCP (Input) -->
+                <div class="form-group">
+                  <label for="ncp">Jumlah Makan Utama per Hari *</label>
+                  <input
+                    type="number"
+                    id="ncp"
+                    name="ncp"
+                    min="1"
+                    max="6"
+                    value="3"
+                    required
+                  />
+                  <div class="input-hint">Rentang: 1 - 6 kali</div>
+                </div>
+
+                <!-- CAEC (Dropdown) -->
+                <div class="form-group">
+                  <label for="caec"
+                    >Frekuensi Makan di Antara Waktu Makan *</label
+                  >
+                  <select id="caec" name="caec" required>
+                    <option value="no">Tidak Pernah</option>
+                    <option value="Sometimes">Kadang-kadang</option>
+                    <option value="Frequently" selected>Sering</option>
+                    <option value="Always">Selalu</option>
+                  </select>
+                </div>
+
+                <!-- SMOKE (Radio) -->
+                <div class="form-group">
+                  <label for="smoke">Apakah Anda Merokok? *</label>
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="smoke" value="yes" />
+                      <span class="radio-custom"></span>
+                      Ya
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="smoke" value="no" checked />
+                      <span class="radio-custom"></span>
+                      Tidak
+                    </label>
+                  </div>
+                </div>
+
+                <!-- CH2O (Slider) -->
+                <div class="form-group">
+                  <label for="ch2o">Asupan Air Harian *</label>
+                  <div class="slider-container">
+                    <input
+                      type="range"
+                      id="ch2o"
+                      name="ch2o"
+                      min="1"
+                      max="3"
+                      step="1"
+                      value="2"
+                    />
+                    <div class="slider-labels">
+                      <span>1 (Sedikit)</span>
+                      <span>2 (Cukup)</span>
+                      <span>3 (Banyak)</span>
+                    </div>
+                    <div class="slider-value">
+                      Nilai: <span id="ch2o-value">2</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SCC (Radio) -->
+                <div class="form-group">
+                  <label for="scc">Memantau Asupan Kalori? *</label>
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="scc" value="yes" />
+                      <span class="radio-custom"></span>
+                      Ya
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="scc" value="no" checked />
+                      <span class="radio-custom"></span>
+                      Tidak
+                    </label>
+                  </div>
+                </div>
+
+                <!-- FAF (Slider) -->
+                <div class="form-group">
+                  <label for="faf">Frekuensi Aktivitas Fisik *</label>
+                  <div class="slider-container">
+                    <input
+                      type="range"
+                      id="faf"
+                      name="faf"
+                      min="0"
+                      max="3"
+                      step="1"
+                      value="1"
+                    />
+                    <div class="slider-labels">
+                      <span>0 (Tidak pernah)</span>
+                      <span>1</span>
+                      <span>2</span>
+                      <span>3 (Sering)</span>
+                    </div>
+                    <div class="slider-value">
+                      Nilai: <span id="faf-value">1</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TUE (Slider) -->
+                <div class="form-group">
+                  <label for="tue">Waktu Menggunakan Teknologi *</label>
+                  <div class="slider-container">
+                    <input
+                      type="range"
+                      id="tue"
+                      name="tue"
+                      min="0"
+                      max="3"
+                      step="1"
+                      value="2"
+                    />
+                    <div class="slider-labels">
+                      <span>0 (Sedikit)</span>
+                      <span>1</span>
+                      <span>2</span>
+                      <span>3 (Banyak)</span>
+                    </div>
+                    <div class="slider-value">
+                      Nilai: <span id="tue-value">2</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CALC (Dropdown) -->
+                <div class="form-group">
+                  <label for="calc">Frekuensi Konsumsi Alkohol *</label>
+                  <select id="calc" name="calc" required>
+                    <option value="no" selected>Tidak Pernah</option>
+                    <option value="Sometimes">Kadang-kadang</option>
+                    <option value="Frequently">Sering</option>
+                    <option value="Always">Selalu</option>
+                  </select>
+                </div>
+
+                <!-- MTRANS (Dropdown) -->
+                <div class="form-group">
+                  <label for="mtrans">Moda Transportasi Utama *</label>
+                  <select id="mtrans" name="mtrans" required>
+                    <option value="Automobile">Mobil</option>
+                    <option value="Bike">Sepeda</option>
+                    <option value="Motorbike">Sepeda Motor</option>
+                    <option value="Public_Transportation" selected>
+                      Transportasi Umum
+                    </option>
+                    <option value="Walking">Berjalan Kaki</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-predict">
+                  <i class="fas fa-calculator"></i> Prediksi Obesitas
+                </button>
+                <button type="button" class="btn-reset" id="reset-btn">
+                  <i class="fas fa-redo"></i> Reset Form
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="result-section">
+            <h2><i class="fas fa-chart-line"></i> Hasil Prediksi</h2>
+
+            <div class="result-card">
+              <div class="result-header">
+                <h3>Status Berat Badan</h3>
+                <div class="confidence-badge" id="confidence-badge">0%</div>
+              </div>
+
+              <div class="prediction-result">
+                <div class="prediction-text" id="prediction-text">
+                  Masukkan data dan klik "Prediksi Obesitas"
+                </div>
+                <div class="prediction-detail" id="prediction-detail">
+                  Hasil prediksi akan muncul di sini
+                </div>
+              </div>
+
+              <div class="probability-chart">
+                <h4>Probabilitas Semua Kategori</h4>
+                <div class="chart-container" id="probability-chart">
+                  <div class="chart-placeholder">
+                    <p>Grafik probabilitas akan muncul setelah prediksi</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="result-info">
+                <h4><i class="fas fa-info-circle"></i> Informasi Kategori</h4>
+                <ul class="category-info">
+                  <li>
+                    <span class="category-label insufficient"
+                      >Insufficient Weight</span
+                    >: Berat badan kurang
+                  </li>
+                  <li>
+                    <span class="category-label normal">Normal Weight</span>:
+                    Berat badan normal
+                  </li>
+                  <li>
+                    <span class="category-label overweight1"
+                      >Overweight Level I</span
+                    >: Kelebihan berat badan tingkat I
+                  </li>
+                  <li>
+                    <span class="category-label overweight2"
+                      >Overweight Level II</span
+                    >: Kelebihan berat badan tingkat II
+                  </li>
+                  <li>
+                    <span class="category-label obesity1">Obesity Type I</span>:
+                    Obesitas tipe I
+                  </li>
+                  <li>
+                    <span class="category-label obesity2">Obesity Type II</span
+                    >: Obesitas tipe II
+                  </li>
+                  <li>
+                    <span class="category-label obesity3">Obesity Type III</span
+                    >: Obesitas tipe III
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Dikembangkan dengan ❤️ oleh Tim MLOps | Model: Logistic Regression |
+          Versi 1.0
+        </p>
+        <p class="disclaimer">
+          <i class="fas fa-exclamation-triangle"></i>
+          Hasil prediksi ini bersifat informatif dan tidak menggantikan
+          diagnosis medis profesional.
+        </p>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
